@@ -158,6 +158,14 @@ class VideoList(Resource):
     """
     Recurso para listar videos con paginación
     """
+    def __init__(self):
+        """
+        Inicializa el recurso y configura el parser
+        """
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('page', type=int, default=1, location='args')
+        self.parser.add_argument('per_page', type=int, default=10, location='args')
+    
     @marshal_with(pagination_fields)
     def get(self):
         """
@@ -166,9 +174,10 @@ class VideoList(Resource):
         Returns:
             dict: Lista paginada de videos con metadatos
         """
-        args = video_list_args.parse_args(strict=True)
-        page = max(1, args.get('page', 1))
-        per_page = min(50, max(1, args.get('per_page', 10)))
+        # Obtener argumentos de query string
+        args = self.parser.parse_args()
+        page = max(1, args['page'])
+        per_page = min(50, max(1, args['per_page']))
         
         # Obtener videos paginados ordenados por id
         query = VideoModel.query.order_by(VideoModel.id)
