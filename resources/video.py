@@ -13,6 +13,20 @@ resource_fields = {
     'likes': fields.Integer
 }
 
+# Parser para los argumentos de paginación
+video_list_args = reqparse.RequestParser()
+video_list_args.add_argument("page", type=int, help="Número de página", default=1)
+video_list_args.add_argument("per_page", type=int, help="Elementos por página", default=10)
+
+# Campos para la respuesta paginada
+pagination_fields = {
+    'items': fields.List(fields.Nested(resource_fields)),
+    'page': fields.Integer,
+    'per_page': fields.Integer,
+    'total': fields.Integer,
+    'pages': fields.Integer
+}
+
 # Parser para los argumentos en solicitudes PUT (crear video)
 video_put_args = reqparse.RequestParser()
 video_put_args.add_argument("name", type=str, help="Nombre del video es requerido", required=True)
@@ -138,4 +152,37 @@ class Video(Resource):
         db.session.delete(video)
         db.session.commit()
         return '', 204
+
+
+class VideoList(Resource):
+    """
+    Recurso para listar videos con paginación
+    """
+    @marshal_with(pagination_fields)
+    def get(self):
+        """
+        Obtiene una lista paginada de videos
+        
+        Returns:
+            dict: Lista paginada de videos con metadatos
+        """
+        args = video_list_args.parse_args(strict=True)
+        page = max(1, args.get('page', 1))
+        per_page = min(50, max(1, args.get('per_page', 10)))
+        
+        # Obtener videos paginados ordenados por id
+        query = VideoModel.query.order_by(VideoModel.id)
+        pagination = query.paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
+        
+        return {
+            'items': pagination.items,
+            'page': pagination.page,
+            'per_page': per_page,
+            'total': pagination.total,
+            'pages': pagination.pages
+        }
 

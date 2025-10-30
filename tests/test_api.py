@@ -53,3 +53,31 @@ def test_put_conflict(client):
     # Intentar crear de nuevo con mismo id
     resp = client.put('/api/videos/2', json=payload)
     assert resp.status_code == 409
+
+
+def test_get_video_list(client):
+    # Crear varios videos para probar paginación
+    for i in range(1, 15):
+        payload = {
+            "name": f"Video {i}",
+            "views": i * 100,
+            "likes": i * 10
+        }
+        client.put(f'/api/videos/{i}', json=payload)
+    
+    # Probar primera página (default: 10 items)
+    resp = client.get('/api/videos')
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert len(data['items']) == 10
+    assert data['page'] == 1
+    assert data['total'] == 14
+    assert data['pages'] == 2
+    
+    # Probar segunda página con tamaño personalizado
+    resp = client.get('/api/videos?page=2&per_page=5')
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert len(data['items']) == 5
+    assert data['page'] == 2
+    assert data['per_page'] == 5

@@ -5,7 +5,7 @@ import os
 from flask import Flask
 from flask_restful import Api
 from models import db
-from resources.video import Video
+from resources.video import Video, VideoList
 from config import config
 
 def create_app(config_name='default'):
@@ -29,6 +29,7 @@ def create_app(config_name='default'):
     api = Api(app)
     
     # Registrar rutas
+    api.add_resource(VideoList, "/api/videos")
     api.add_resource(Video, "/api/videos/<int:video_id>")
     
     return app
