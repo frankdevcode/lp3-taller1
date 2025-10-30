@@ -8,17 +8,17 @@ from marshmallow import Schema, fields
 
 # Esquemas para la documentación
 class VideoSchema(Schema):
-    id = fields.Int(required=True, description="ID único del video")
-    name = fields.Str(required=True, description="Nombre o título del video")
-    views = fields.Int(required=True, description="Número de vistas")
-    likes = fields.Int(required=True, description="Número de likes")
+    id = fields.Int(required=True, metadata={"description": "ID único del video"})
+    name = fields.Str(required=True, metadata={"description": "Nombre o título del video"})
+    views = fields.Int(required=True, metadata={"description": "Número de vistas"})
+    likes = fields.Int(required=True, metadata={"description": "Número de likes"})
 
 class PaginationSchema(Schema):
-    items = fields.List(fields.Nested(VideoSchema), description="Lista de videos en la página actual")
-    page = fields.Int(description="Número de página actual")
-    per_page = fields.Int(description="Elementos por página")
-    total = fields.Int(description="Total de videos")
-    pages = fields.Int(description="Total de páginas")
+    items = fields.List(fields.Nested(VideoSchema), metadata={"description": "Lista de videos en la página actual"})
+    page = fields.Int(metadata={"description": "Número de página actual"})
+    per_page = fields.Int(metadata={"description": "Elementos por página"})
+    total = fields.Int(metadata={"description": "Total de videos"})
+    pages = fields.Int(metadata={"description": "Total de páginas"})
 
 # Crear especificación
 spec = APISpec(
