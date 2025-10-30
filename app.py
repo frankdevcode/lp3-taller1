@@ -2,11 +2,13 @@
 Archivo principal de la aplicación Flask
 """
 import os
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Api
+from flask_swagger_ui import get_swaggerui_blueprint
 from models import db
 from resources.video import Video, VideoList
 from config import config
+from swagger import spec
 
 def create_app(config_name='default'):
     """
@@ -28,7 +30,26 @@ def create_app(config_name='default'):
     db.init_app(app)
     api = Api(app)
     
-    # Registrar rutas
+    # Configurar Swagger UI
+    SWAGGER_URL = '/api/docs'
+    API_URL = '/api/swagger.json'
+    
+    swaggerui_blueprint = get_swaggerui_blueprint(
+        SWAGGER_URL,
+        API_URL,
+        config={
+            'app_name': "API de Videos"
+        }
+    )
+    
+    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+    
+    # Endpoint para especificación OpenAPI
+    @app.route('/api/swagger.json')
+    def create_swagger_spec():
+        return jsonify(spec.to_dict())
+    
+    # Registrar rutas de la API
     api.add_resource(VideoList, "/api/videos")
     api.add_resource(Video, "/api/videos/<int:video_id>")
     
