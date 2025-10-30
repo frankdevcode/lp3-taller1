@@ -73,6 +73,35 @@ lp3-taller1
 
 ## Uso de la API
 
+### Listar videos
+
+```
+GET /api/videos?page=1&per_page=10
+```
+
+Parámetros de consulta:
+- `page`: Número de página (default: 1)
+- `per_page`: Elementos por página (default: 10, máx: 50)
+
+Respuesta:
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "Tutorial de Python",
+      "views": 1500,
+      "likes": 120
+    },
+    // ... más videos ...
+  ],
+  "page": 1,
+  "per_page": 10,
+  "total": 25,
+  "pages": 3
+}
+```
+
 ### Obtener un video
 
 ```
