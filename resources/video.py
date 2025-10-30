@@ -59,8 +59,10 @@ class Video(Resource):
         Returns:
             VideoModel: El video solicitado
         """
-        # TODO
-        pass
+        video = VideoModel.query.filter_by(id=video_id).first()
+        if not video:
+            abort(404, message=f"No se encontró un video con el ID {video_id}")
+        return video
     
     @marshal_with(resource_fields)
     def put(self, video_id):
@@ -73,8 +75,26 @@ class Video(Resource):
         Returns:
             VideoModel: El video creado
         """
-        # TODO
-        pass
+        # Verificar que no exista ya
+        existing = VideoModel.query.filter_by(id=video_id).first()
+        if existing:
+            abort(409, message=f"Ya existe un video con el ID {video_id}")
+
+        args = video_put_args.parse_args()
+        # Validaciones básicas
+        name = args.get('name')
+        views = args.get('views')
+        likes = args.get('likes')
+
+        if views is None or likes is None or name is None:
+            abort(400, message="Campos 'name', 'views' y 'likes' son requeridos")
+        if views < 0 or likes < 0:
+            abort(400, message="'views' y 'likes' deben ser enteros no negativos")
+
+        video = VideoModel(id=video_id, name=name, views=views, likes=likes)
+        db.session.add(video)
+        db.session.commit()
+        return video, 201
     
     @marshal_with(resource_fields)
     def patch(self, video_id):
@@ -87,8 +107,22 @@ class Video(Resource):
         Returns:
             VideoModel: El video actualizado
         """
-        # TODO
-        pass
+        video = abort_if_video_doesnt_exist(video_id)
+        args = video_update_args.parse_args()
+
+        if args.get('name') is not None:
+            video.name = args.get('name')
+        if args.get('views') is not None:
+            if args.get('views') < 0:
+                abort(400, message="'views' debe ser un entero no negativo")
+            video.views = args.get('views')
+        if args.get('likes') is not None:
+            if args.get('likes') < 0:
+                abort(400, message="'likes' debe ser un entero no negativo")
+            video.likes = args.get('likes')
+
+        db.session.commit()
+        return video
     
     def delete(self, video_id):
         """
@@ -100,6 +134,8 @@ class Video(Resource):
         Returns:
             str: Mensaje vacío con código 204
         """
-        # TODO
-        pass
+        video = abort_if_video_doesnt_exist(video_id)
+        db.session.delete(video)
+        db.session.commit()
+        return '', 204
 
