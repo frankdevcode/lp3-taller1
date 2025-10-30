@@ -4,10 +4,10 @@ Esta es una API RESTful para gestión de videos, desarrollada con Flask, Flask-R
 
 ## Datos del Estudiante
 
-- **Nombre:** [Tu Nombre]
-- **Matrícula:** [Tu Matrícula]
+- **Nombre:** Francisco Perlaza
+- **Programa:** Ingeniería de Sistemas
 - **Asignatura:** Lenguaje de Programación III
-- **Profesor:** [Nombre del Profesor]
+- **Profesor:** Diego Marin
 
 ## Descripción
 
